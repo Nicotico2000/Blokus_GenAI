@@ -1,0 +1,67 @@
+- name: phase-1
+  color: "1D76DB"
+  description: "Work scoped to Phase 1 (Classic baseline)."
+- name: phase-2
+  color: "5319E7"
+  description: "Work scoped to Phase 2 (Duo extension)."
+- name: cross-phase
+  color: "0052CC"
+  description: "Work spanning multiple project phases."
+
+- name: classic
+  color: "0E8A16"
+  description: "Classic mode scope."
+- name: duo
+  color: "B60205"
+  description: "Duo mode scope."
+- name: shared-engine
+  color: "FBCA04"
+  description: "Shared engine and configuration scope."
+
+- name: requirement
+  color: "D93F0B"
+  description: "Requirements definition or refinement."
+- name: implementation
+  color: "0052CC"
+  description: "Code implementation task."
+- name: testing
+  color: "5319E7"
+  description: "Automated or manual test work."
+- name: documentation
+  color: "0075CA"
+  description: "Documentation task."
+- name: bug
+  color: "B60205"
+  description: "Defect or regression."
+- name: counterexample
+  color: "E99695"
+  description: "Reproducible failure case."
+- name: review
+  color: "C5DEF5"
+  description: "Human review task."
+- name: decision
+  color: "F9D0C4"
+  description: "Architecture or process decision."
+
+- name: prio-high
+  color: "B60205"
+  description: "High priority."
+- name: prio-medium
+  color: "FBCA04"
+  description: "Medium priority."
+- name: prio-low
+  color: "0E8A16"
+  description: "Low priority."
+
+- name: blocked
+  color: "D4C5F9"
+  description: "Blocked by dependency or decision."
+- name: needs-human-review
+  color: "E99695"
+  description: "Cannot close without explicit human review."
+- name: ready
+  color: "0E8A16"
+  description: "Ready to start."
+- name: in-progress
+  color: "FBCA04"
+  description: "Currently being worked on."

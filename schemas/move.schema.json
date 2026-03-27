@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/schemas/move.schema.json",
+  "title": "Blokus Move",
+  "description": "One proposed or completed move in the Blokus engine.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "player",
+    "piece",
+    "x",
+    "y"
+  ],
+  "properties": {
+    "player": {
+      "$ref": "#/$defs/playerId"
+    },
+    "piece": {
+      "$ref": "#/$defs/pieceId"
+    },
+    "x": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "y": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "rotation": {
+      "description": "Quarter turns clockwise.",
+      "type": "integer",
+      "enum": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "default": 0
+    },
+    "flipped": {
+      "description": "Horizontal reflection before rotation.",
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "$defs": {
+    "playerId": {
+      "type": "string",
+      "enum": [
+        "blue",
+        "yellow",
+        "red",
+        "green",
+        "orange"
+      ]
+    },
+    "pieceId": {
+      "type": "string",
+      "enum": [
+        "I1",
+        "I2",
+        "I3",
+        "V3",
+        "I4",
+        "O4",
+        "T4",
+        "L4",
+        "Z4",
+        "F5",
+        "I5",
+        "L5",
+        "N5",
+        "P5",
+        "T5",
+        "U5",
+        "V5",
+        "W5",
+        "X5",
+        "Y5",
+        "Z5"
+      ]
+    }
+  }
+}

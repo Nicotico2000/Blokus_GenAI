@@ -1,0 +1,314 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/schemas/game_state.schema.json",
+  "title": "Blokus Game State",
+  "description": "Serializable game state used by CLI operations, fixtures, and tests.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "mode",
+    "board_size",
+    "players",
+    "start_corners",
+    "board",
+    "remaining_pieces",
+    "history",
+    "current_player",
+    "consecutive_passes",
+    "finished",
+    "controller_types",
+    "controller_strategies"
+  ],
+  "properties": {
+    "mode": {
+      "type": "string",
+      "enum": [
+        "classic",
+        "duo"
+      ]
+    },
+    "board_size": {
+      "type": "integer",
+      "enum": [
+        14,
+        20
+      ]
+    },
+    "players": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 4,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/playerId"
+      }
+    },
+    "start_corners": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "blue": {
+          "$ref": "#/$defs/coordinate"
+        },
+        "yellow": {
+          "$ref": "#/$defs/coordinate"
+        },
+        "red": {
+          "$ref": "#/$defs/coordinate"
+        },
+        "green": {
+          "$ref": "#/$defs/coordinate"
+        },
+        "orange": {
+          "$ref": "#/$defs/coordinate"
+        }
+      }
+    },
+    "board": {
+      "type": "array",
+      "description": "Board rows encoded as strings. '.' means empty.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "remaining_pieces": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "blue": {
+          "$ref": "#/$defs/pieceBag"
+        },
+        "yellow": {
+          "$ref": "#/$defs/pieceBag"
+        },
+        "red": {
+          "$ref": "#/$defs/pieceBag"
+        },
+        "green": {
+          "$ref": "#/$defs/pieceBag"
+        },
+        "orange": {
+          "$ref": "#/$defs/pieceBag"
+        }
+      }
+    },
+    "history": {
+      "type": "array",
+      "items": {
+        "$ref": "./move.schema.json"
+      }
+    },
+    "current_player": {
+      "$ref": "#/$defs/playerId"
+    },
+    "consecutive_passes": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "finished": {
+      "type": "boolean"
+    },
+    "controller_types": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "blue": {
+          "$ref": "#/$defs/controllerType"
+        },
+        "yellow": {
+          "$ref": "#/$defs/controllerType"
+        },
+        "red": {
+          "$ref": "#/$defs/controllerType"
+        },
+        "green": {
+          "$ref": "#/$defs/controllerType"
+        },
+        "orange": {
+          "$ref": "#/$defs/controllerType"
+        }
+      }
+    },
+    "controller_strategies": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "blue": {
+          "type": "string",
+          "minLength": 1
+        },
+        "yellow": {
+          "type": "string",
+          "minLength": 1
+        },
+        "red": {
+          "type": "string",
+          "minLength": 1
+        },
+        "green": {
+          "type": "string",
+          "minLength": 1
+        },
+        "orange": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "mode": {
+            "const": "classic"
+          }
+        },
+        "required": [
+          "mode"
+        ]
+      },
+      "then": {
+        "properties": {
+          "board_size": {
+            "const": 20
+          },
+          "players": {
+            "const": [
+              "blue",
+              "yellow",
+              "red",
+              "green"
+            ]
+          },
+          "current_player": {
+            "enum": [
+              "blue",
+              "yellow",
+              "red",
+              "green"
+            ]
+          },
+          "board": {
+            "type": "array",
+            "minItems": 20,
+            "maxItems": 20,
+            "items": {
+              "type": "string",
+              "pattern": "^[.BYRG]{20}$"
+            }
+          }
+        },
+        "required": [
+          "board_size",
+          "players"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "mode": {
+            "const": "duo"
+          }
+        },
+        "required": [
+          "mode"
+        ]
+      },
+      "then": {
+        "properties": {
+          "board_size": {
+            "const": 14
+          },
+          "players": {
+            "const": [
+              "blue",
+              "orange"
+            ]
+          },
+          "current_player": {
+            "enum": [
+              "blue",
+              "orange"
+            ]
+          },
+          "board": {
+            "type": "array",
+            "minItems": 14,
+            "maxItems": 14,
+            "items": {
+              "type": "string",
+              "pattern": "^[.BO]{14}$"
+            }
+          }
+        },
+        "required": [
+          "board_size",
+          "players"
+        ]
+      }
+    }
+  ],
+  "$defs": {
+    "coordinate": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": {
+        "type": "integer",
+        "minimum": 0
+      }
+    },
+    "controllerType": {
+      "type": "string",
+      "enum": [
+        "human",
+        "computer"
+      ]
+    },
+    "pieceBag": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/pieceId"
+      }
+    },
+    "pieceId": {
+      "type": "string",
+      "enum": [
+        "I1",
+        "I2",
+        "I3",
+        "V3",
+        "I4",
+        "O4",
+        "T4",
+        "L4",
+        "Z4",
+        "F5",
+        "I5",
+        "L5",
+        "N5",
+        "P5",
+        "T5",
+        "U5",
+        "V5",
+        "W5",
+        "X5",
+        "Y5",
+        "Z5"
+      ]
+    },
+    "playerId": {
+      "type": "string",
+      "enum": [
+        "blue",
+        "yellow",
+        "red",
+        "green",
+        "orange"
+      ]
+    }
+  }
+}

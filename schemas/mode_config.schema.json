@@ -1,0 +1,200 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/schemas/mode_config.schema.json",
+  "title": "Blokus Mode Configuration",
+  "description": "Static per-mode configuration consumed by the shared engine.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "name",
+    "board_size",
+    "players",
+    "start_corners",
+    "piece_ids"
+  ],
+  "properties": {
+    "name": {
+      "type": "string",
+      "enum": [
+        "classic",
+        "duo"
+      ]
+    },
+    "board_size": {
+      "type": "integer",
+      "enum": [
+        14,
+        20
+      ]
+    },
+    "players": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 4,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/playerId"
+      }
+    },
+    "start_corners": {
+      "type": "object",
+      "description": "Player-specific mandatory opening coordinate.",
+      "additionalProperties": false,
+      "properties": {
+        "blue": {
+          "$ref": "#/$defs/coordinate"
+        },
+        "yellow": {
+          "$ref": "#/$defs/coordinate"
+        },
+        "red": {
+          "$ref": "#/$defs/coordinate"
+        },
+        "green": {
+          "$ref": "#/$defs/coordinate"
+        },
+        "orange": {
+          "$ref": "#/$defs/coordinate"
+        }
+      }
+    },
+    "piece_ids": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/pieceId"
+      }
+    },
+    "starting_rule": {
+      "type": "string",
+      "enum": [
+        "must-cover-start-corner"
+      ],
+      "default": "must-cover-start-corner"
+    },
+    "continuation_rule": {
+      "type": "string",
+      "enum": [
+        "corner-touch-no-edge-touch"
+      ],
+      "default": "corner-touch-no-edge-touch"
+    },
+    "termination_rule": {
+      "type": "string",
+      "enum": [
+        "all-players-blocked"
+      ],
+      "default": "all-players-blocked"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "name": {
+            "const": "classic"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "then": {
+        "properties": {
+          "board_size": {
+            "const": 20
+          },
+          "players": {
+            "const": [
+              "blue",
+              "yellow",
+              "red",
+              "green"
+            ]
+          }
+        },
+        "required": [
+          "board_size",
+          "players"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "name": {
+            "const": "duo"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "then": {
+        "properties": {
+          "board_size": {
+            "const": 14
+          },
+          "players": {
+            "const": [
+              "blue",
+              "orange"
+            ]
+          }
+        },
+        "required": [
+          "board_size",
+          "players"
+        ]
+      }
+    }
+  ],
+  "$defs": {
+    "coordinate": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": {
+        "type": "integer",
+        "minimum": 0
+      }
+    },
+    "playerId": {
+      "type": "string",
+      "enum": [
+        "blue",
+        "yellow",
+        "red",
+        "green",
+        "orange"
+      ]
+    },
+    "pieceId": {
+      "type": "string",
+      "enum": [
+        "I1",
+        "I2",
+        "I3",
+        "V3",
+        "I4",
+        "O4",
+        "T4",
+        "L4",
+        "Z4",
+        "F5",
+        "I5",
+        "L5",
+        "N5",
+        "P5",
+        "T5",
+        "U5",
+        "V5",
+        "W5",
+        "X5",
+        "Y5",
+        "Z5"
+      ]
+    }
+  }
+}
