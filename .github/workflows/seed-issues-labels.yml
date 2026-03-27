@@ -1,0 +1,419 @@
+name: Seed Issues And Labels
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/seed-issues-labels.yml
+      - docs/issue-seed.md
+      - .github/labels.yml
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  seed:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ensure labels and issues
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const labels = [
+              { name: "phase-1", color: "1D76DB", description: "Work scoped to Phase 1 (Classic baseline)." },
+              { name: "phase-2", color: "5319E7", description: "Work scoped to Phase 2 (Duo extension)." },
+              { name: "cross-phase", color: "0052CC", description: "Work spanning multiple project phases." },
+              { name: "classic", color: "0E8A16", description: "Classic mode scope." },
+              { name: "duo", color: "B60205", description: "Duo mode scope." },
+              { name: "shared-engine", color: "FBCA04", description: "Shared engine and configuration scope." },
+              { name: "requirement", color: "D93F0B", description: "Requirements definition or refinement." },
+              { name: "implementation", color: "0052CC", description: "Code implementation task." },
+              { name: "testing", color: "5319E7", description: "Automated or manual test work." },
+              { name: "documentation", color: "0075CA", description: "Documentation task." },
+              { name: "bug", color: "B60205", description: "Defect or regression." },
+              { name: "counterexample", color: "E99695", description: "Reproducible failure case." },
+              { name: "review", color: "C5DEF5", description: "Human review task." },
+              { name: "decision", color: "F9D0C4", description: "Architecture or process decision." },
+              { name: "prio-high", color: "B60205", description: "High priority." },
+              { name: "prio-medium", color: "FBCA04", description: "Medium priority." },
+              { name: "prio-low", color: "0E8A16", description: "Low priority." },
+              { name: "blocked", color: "D4C5F9", description: "Blocked by dependency or decision." },
+              { name: "needs-human-review", color: "E99695", description: "Cannot close without explicit human review." },
+              { name: "ready", color: "0E8A16", description: "Ready to start." },
+              { name: "in-progress", color: "FBCA04", description: "Currently being worked on." },
+            ];
+
+            const issues = [
+              {
+                title: "[DOCUMENTATION] Draft requirements baseline in docs/requirements.md",
+                requirementIds: ["R-F-01", "R-F-14", "R-NF-03", "R-D-05"],
+                motivation: "Requirements must remain stable in Markdown and not drift across issues and PRs.",
+                acceptance: [
+                  "docs/requirements.md contains required sections and IDs.",
+                  "Phase 1 and Phase 2 boundaries are explicit.",
+                  "Constraints and out-of-scope are explicit.",
+                ],
+                deliverables: ["docs/requirements.md"],
+                evidence: ["PR diff and reviewer confirmation of required IDs."],
+                labels: ["phase-1", "shared-engine", "documentation", "requirement", "prio-high", "ready"],
+              },
+              {
+                title: "[DOCUMENTATION] Create OWNERSHIP.md",
+                requirementIds: ["R-NF-03", "R-D-02", "R-D-04"],
+                motivation: "Ownership and reviewer accountability must be explicit and traceable.",
+                acceptance: [
+                  "Ownership table includes required columns.",
+                  "All key areas have owner and reviewer placeholders.",
+                  "Acceptance basis and evidence columns reference concrete artifacts.",
+                ],
+                deliverables: ["OWNERSHIP.md"],
+                evidence: ["PR diff and review sign-off."],
+                labels: ["phase-1", "shared-engine", "documentation", "decision", "prio-high", "ready"],
+              },
+              {
+                title: "[DOCUMENTATION] Create TEAM_SUMMARY.md skeleton",
+                requirementIds: ["R-D-01", "R-D-03"],
+                motivation: "A concise project summary is needed for reporting and review checkpoints.",
+                acceptance: [
+                  "Includes project scope, architecture summary, and key deliverables.",
+                  "Includes placeholders for AI usage, results, counterexamples, and Classic to Duo impact.",
+                ],
+                deliverables: ["TEAM_SUMMARY.md"],
+                evidence: ["PR diff."],
+                labels: ["phase-1", "cross-phase", "documentation", "prio-medium", "ready"],
+              },
+              {
+                title: "[IMPLEMENTATION] Define core domain model for board, piece, move, player, and game state",
+                requirementIds: ["R-F-01", "R-F-14"],
+                motivation: "Shared-engine development depends on stable model boundaries.",
+                acceptance: [
+                  "Core model artifacts are documented and implemented.",
+                  "Game state remains serializable and mode-aware.",
+                  "Traceability entries are updated.",
+                ],
+                deliverables: ["src/blokus/models.py", "docs/architecture.md"],
+                evidence: ["Tests and traceability updates."],
+                labels: ["phase-1", "shared-engine", "implementation", "prio-high", "ready"],
+              },
+              {
+                title: "[IMPLEMENTATION] Add Classic mode configuration",
+                requirementIds: ["R-F-11", "R-F-10"],
+                motivation: "Classic configuration is the Phase 1 acceptance baseline.",
+                acceptance: [
+                  "Classic board size, players, and start corners are explicit.",
+                  "Engine logic uses runtime configuration.",
+                ],
+                deliverables: ["src/blokus/config.py"],
+                evidence: ["tests/test_engine.py output."],
+                labels: ["phase-1", "classic", "implementation", "prio-high", "ready"],
+              },
+              {
+                title: "[IMPLEMENTATION] Add Duo mode configuration contract",
+                requirementIds: ["R-F-12", "R-F-14", "R-T-03"],
+                motivation: "Duo must be introduced via shared config, not a second engine.",
+                acceptance: [
+                  "Duo mode is represented in schema and contract docs.",
+                  "Duo board and player constraints are explicit.",
+                  "No duplicated engine path is introduced.",
+                ],
+                deliverables: ["schemas/mode_config.schema.json", "docs/json-contracts.md", "docs/architecture.md"],
+                evidence: ["Schema review and traceability update."],
+                labels: ["phase-2", "duo", "shared-engine", "implementation", "prio-medium", "ready"],
+              },
+              {
+                title: "[IMPLEMENTATION] Implement piece transformations",
+                requirementIds: ["R-F-13"],
+                motivation: "Transformation correctness is foundational to legal placement.",
+                acceptance: [
+                  "Rotation and reflection with de-duplication are implemented.",
+                  "Behavior is covered by automated tests.",
+                ],
+                deliverables: ["src/blokus/pieces.py"],
+                evidence: ["tests/test_pieces.py output."],
+                labels: ["phase-1", "classic", "implementation", "prio-high", "ready"],
+              },
+              {
+                title: "[IMPLEMENTATION] Implement move legality checking",
+                requirementIds: ["R-F-04", "R-F-10"],
+                motivation: "Legality checking is the core correctness gate.",
+                acceptance: [
+                  "Turn order, bounds, overlap, opening, and touch rules are enforced.",
+                  "Illegal moves produce actionable reasons.",
+                ],
+                deliverables: ["src/blokus/engine.py"],
+                evidence: ["tests/test_engine.py and review notes."],
+                labels: ["phase-1", "classic", "implementation", "prio-high", "ready"],
+              },
+              {
+                title: "[IMPLEMENTATION] Implement move application",
+                requirementIds: ["R-F-05", "R-T-04"],
+                motivation: "State transitions must remain correct and reproducible.",
+                acceptance: [
+                  "Apply updates board, history, turn, and remaining pieces.",
+                  "Invalid applications are rejected.",
+                ],
+                deliverables: ["src/blokus/engine.py"],
+                evidence: ["tests/test_engine.py and tests/test_evaluate.py."],
+                labels: ["phase-1", "classic", "implementation", "prio-high", "ready"],
+              },
+              {
+                title: "[IMPLEMENTATION] Implement legal move generation",
+                requirementIds: ["R-F-06"],
+                motivation: "Legal-move listing is required for CLI and simple computer play.",
+                acceptance: [
+                  "Legal moves are generated without duplicates.",
+                  "Optional limit is supported.",
+                ],
+                deliverables: ["src/blokus/engine.py"],
+                evidence: ["tests/test_ai.py and CLI sample output."],
+                labels: ["phase-1", "classic", "implementation", "prio-medium", "ready"],
+              },
+              {
+                title: "[IMPLEMENTATION] Implement JSON state load and serialization",
+                requirementIds: ["R-F-03", "R-F-07", "R-T-04"],
+                motivation: "JSON contracts are required for CLI, fixtures, and reproducibility.",
+                acceptance: [
+                  "State loading validates mode-compatible shape.",
+                  "Round-trip serialization is stable.",
+                  "Contract docs and schemas align with implementation.",
+                ],
+                deliverables: ["src/blokus/models.py", "schemas/game_state.schema.json", "docs/json-contracts.md"],
+                evidence: ["tests/test_serialization.py output."],
+                labels: ["phase-1", "shared-engine", "implementation", "prio-high", "ready"],
+              },
+              {
+                title: "[IMPLEMENTATION] Implement minimal CLI",
+                requirementIds: ["R-F-02", "R-F-08", "R-F-09"],
+                motivation: "CLI is the baseline interaction and automation surface.",
+                acceptance: [
+                  "Required commands exist and are scriptable.",
+                  "Error paths are readable and deterministic.",
+                ],
+                deliverables: ["src/blokus/cli.py"],
+                evidence: ["tests/test_cli.py and README command examples."],
+                labels: ["phase-1", "shared-engine", "implementation", "prio-high", "ready"],
+              },
+              {
+                title: "[TESTING] Add fixtures for Classic placement legality",
+                requirementIds: ["R-T-06", "R-T-04"],
+                motivation: "Fixtures provide repeatable legality regression coverage.",
+                acceptance: [
+                  "Fixture files are valid and loadable.",
+                  "Fixtures cover legal and illegal placement contexts.",
+                ],
+                deliverables: ["fixtures/states", "fixtures/scenarios"],
+                evidence: ["Harness replay and review notes."],
+                labels: ["phase-1", "classic", "testing", "prio-medium", "ready"],
+              },
+              {
+                title: "[TESTING] Add transformation tests",
+                requirementIds: ["R-T-02", "R-F-13"],
+                motivation: "Transform regressions silently break legality and move generation.",
+                acceptance: [
+                  "Representative symmetry and asymmetry cases are covered.",
+                  "Duplicate transform regressions are detectable.",
+                ],
+                deliverables: ["tests/test_pieces.py"],
+                evidence: ["Test run output."],
+                labels: ["phase-1", "classic", "testing", "prio-high", "ready"],
+              },
+              {
+                title: "[TESTING] Add serialization round-trip tests",
+                requirementIds: ["R-T-04", "R-F-03", "R-F-07"],
+                motivation: "Stable serialization is required for fixtures and CLI reproducibility.",
+                acceptance: [
+                  "Round-trip tests cover initial and in-progress states.",
+                  "Controller metadata survives serialization.",
+                ],
+                deliverables: ["tests/test_serialization.py"],
+                evidence: ["Test run output."],
+                labels: ["phase-1", "shared-engine", "testing", "prio-medium", "ready"],
+              },
+              {
+                title: "[TESTING] Add end-to-end Classic baseline test",
+                requirementIds: ["R-T-01", "R-NF-01", "R-NF-02", "R-E-01"],
+                motivation: "End-to-end acceptance checks are needed for release confidence.",
+                acceptance: [
+                  "Fixture-backed evaluation runs in CI and locally.",
+                  "Failures are reproducible and actionable.",
+                ],
+                deliverables: ["src/blokus/evaluate.py", "tests/test_evaluate.py", ".github/workflows/ci.yml"],
+                evidence: ["CI run and scripts/evaluate.sh output."],
+                labels: ["phase-1", "classic", "testing", "prio-high", "ready"],
+              },
+              {
+                title: "[DOCUMENTATION] Create AI usage log",
+                requirementIds: ["R-D-10", "R-R-04", "R-E-05", "R-T-05"],
+                motivation: "AI-assisted claims must be reviewable and evidence-based.",
+                acceptance: [
+                  "Required AI log fields are present.",
+                  "Entries include validation and adoption decisions.",
+                ],
+                deliverables: ["docs/ai-usage.md"],
+                evidence: ["Completed AI log entries in PR scope."],
+                labels: ["cross-phase", "documentation", "review", "prio-high", "ready"],
+              },
+              {
+                title: "[DOCUMENTATION] Create evidence log",
+                requirementIds: ["R-R-02", "R-R-03", "R-NF-05", "R-D-06"],
+                motivation: "Course evaluation requires reproducible evidence of both successes and failures.",
+                acceptance: [
+                  "Template includes required fields.",
+                  "At least one entry records worked and failed outcomes plus next action.",
+                ],
+                deliverables: ["docs/evidence-log.md"],
+                evidence: ["Updated log entries with links."],
+                labels: ["cross-phase", "documentation", "counterexample", "prio-high", "ready"],
+              },
+              {
+                title: "[DOCUMENTATION] Create JSON contract documentation",
+                requirementIds: ["R-F-03", "R-F-07", "R-D-05"],
+                motivation: "Contracts must be clear to implementers and reviewers.",
+                acceptance: [
+                  "Each schema purpose is documented.",
+                  "Valid and invalid examples are provided.",
+                  "Relation to CLI, tests, and fixtures is explicit.",
+                ],
+                deliverables: ["docs/json-contracts.md"],
+                evidence: ["Reviewer sign-off."],
+                labels: ["phase-1", "shared-engine", "documentation", "prio-medium", "ready"],
+              },
+              {
+                title: "[DOCUMENTATION] Create traceability matrix",
+                requirementIds: ["R-NF-03", "R-NF-05"],
+                motivation: "Traceability reduces ambiguity during implementation and evaluation.",
+                acceptance: [
+                  "Matrix includes all baseline requirement IDs.",
+                  "Each row links to issues, files, tests, and evidence.",
+                ],
+                deliverables: ["docs/traceability-matrix.md"],
+                evidence: ["Traceability review checklist completion."],
+                labels: ["cross-phase", "documentation", "requirement", "prio-high", "ready"],
+              },
+              {
+                title: "[REVIEW] Human review of Phase 1 requirements",
+                requirementIds: ["R-D-07", "R-D-08", "R-D-09"],
+                motivation: "Phase 1 requirements must be explicitly validated by a human reviewer.",
+                acceptance: [
+                  "Reviewer confirms required IDs and phase boundaries.",
+                  "Review outcome is recorded as accepted, revised, or deferred.",
+                ],
+                deliverables: ["Review notes linked from PR/evidence log"],
+                evidence: ["docs/evidence-log.md entry and PR comments."],
+                labels: ["phase-1", "review", "needs-human-review", "prio-high", "ready"],
+              },
+              {
+                title: "[REVIEW] Human review of legality rules and acceptance tests",
+                requirementIds: ["R-F-04", "R-F-10", "R-T-04", "R-T-05"],
+                motivation: "Legality logic is high-risk and needs explicit non-author review.",
+                acceptance: [
+                  "Reviewer inspects legality paths and linked tests.",
+                  "At least one counterexample is checked or explicitly not found.",
+                  "Outcome and follow-up actions are recorded.",
+                ],
+                deliverables: ["Review notes and updated evidence log"],
+                evidence: ["PR discussion and docs/evidence-log.md entry."],
+                labels: ["phase-1", "classic", "review", "needs-human-review", "prio-high", "ready"],
+              },
+            ];
+
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+
+            async function ensureLabel(label) {
+              try {
+                await github.rest.issues.getLabel({
+                  owner,
+                  repo,
+                  name: label.name,
+                });
+                await github.rest.issues.updateLabel({
+                  owner,
+                  repo,
+                  name: label.name,
+                  new_name: label.name,
+                  color: label.color,
+                  description: label.description,
+                });
+                core.info(`Updated label: ${label.name}`);
+              } catch (error) {
+                if (error.status === 404) {
+                  await github.rest.issues.createLabel({
+                    owner,
+                    repo,
+                    name: label.name,
+                    color: label.color,
+                    description: label.description,
+                  });
+                  core.info(`Created label: ${label.name}`);
+                } else {
+                  throw error;
+                }
+              }
+            }
+
+            function issueBody(issue) {
+              const req = issue.requirementIds.map((id) => `- \`${id}\``).join("\n");
+              const acceptance = issue.acceptance.map((item) => `- [ ] ${item}`).join("\n");
+              const deliverables = issue.deliverables.map((item) => `- ${item}`).join("\n");
+              const evidence = issue.evidence.map((item) => `- ${item}`).join("\n");
+              return [
+                "## Summary",
+                issue.title,
+                "",
+                "## Motivation",
+                issue.motivation,
+                "",
+                "## Related requirement IDs",
+                req,
+                "",
+                "## Acceptance criteria",
+                acceptance,
+                "",
+                "## Deliverables",
+                deliverables,
+                "",
+                "## Suggested evidence",
+                evidence,
+                "",
+                "_Seed source: docs/issue-seed.md_",
+              ].join("\n");
+            }
+
+            async function allIssues() {
+              return await github.paginate(github.rest.issues.listForRepo, {
+                owner,
+                repo,
+                state: "all",
+                per_page: 100,
+              });
+            }
+
+            for (const label of labels) {
+              await ensureLabel(label);
+            }
+
+            const existing = await allIssues();
+            const existingTitles = new Set(
+              existing
+                .filter((item) => !Object.prototype.hasOwnProperty.call(item, "pull_request"))
+                .map((item) => item.title)
+            );
+
+            for (const issue of issues) {
+              if (existingTitles.has(issue.title)) {
+                core.info(`Issue exists, skipping: ${issue.title}`);
+                continue;
+              }
+              const created = await github.rest.issues.create({
+                owner,
+                repo,
+                title: issue.title,
+                body: issueBody(issue),
+                labels: issue.labels,
+              });
+              core.info(`Created issue #${created.data.number}: ${issue.title}`);
+            }
