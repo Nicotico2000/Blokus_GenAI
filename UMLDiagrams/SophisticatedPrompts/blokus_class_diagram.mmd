@@ -1,0 +1,97 @@
+classDiagram
+    direction LR
+
+    class OrderStatus {
+        <<Enumeration>>
+        IN_PROGRESS
+        FINISHED
+    }
+
+    class ModeConfig {
+        +name: str
+        +board_size: int
+        +players: tuple[str]
+        +start_corners: dict[str, tuple[int,int]]
+    }
+
+    class Move {
+        +player: str
+        +piece: str
+        +x: int
+        +y: int
+        +rotation: int
+        +flipped: bool
+        +toDict() dict[str, object]
+        +fromDict(data: dict[str, object]) Move$
+    }
+
+    class ValidationResult {
+        +ok: bool
+        +reason: str
+    }
+
+    class Transform {
+        +rotation: int
+        +flipped: bool
+        +cells: tuple[tuple[int,int]]
+    }
+
+    class PieceDefinition {
+        +piece_id: str
+        +cells: tuple[tuple[int,int]]
+        +transforms: tuple[Transform]
+        +size() int
+    }
+
+    class GameState {
+        +mode: str
+        -board: list[list[str|None]]
+        +players: tuple[str]
+        +start_corners: dict[str, tuple[int,int]]
+        +remaining_pieces: dict[str, set[str]]
+        +history: list[Move]
+        +current_player_index: int
+        +consecutive_passes: int
+        +controller_types: dict[str, str]
+        +controller_strategies: dict[str, str]
+        -status: OrderStatus
+        +getBoardSize() int
+        +getCurrentPlayer() str
+        +clone() GameState
+        +toDict() dict[str, object]
+        +fromDict(data: dict[str, object]) GameState$
+    }
+
+    class GameEngine {
+        <<Service>>
+        +newGame(mode: str, controllers: dict[str, str], strategies: dict[str, str]) GameState
+        +validateMove(state: GameState, move: Move) ValidationResult
+        +applyMove(state: GameState, move: Move) GameState
+        +validatePass(state: GameState, player: str) ValidationResult
+        +passTurn(state: GameState, player: str) GameState
+        +listLegalMoves(state: GameState, player: str, limit: int) list[Move]
+        +computeScores(state: GameState) dict[str, int]
+        +occupiedSquareCounts(state: GameState) dict[str, int]
+    }
+
+    class MoveSelector {
+        <<Service>>
+        +chooseSimpleMove(state: GameState, player: str) Move
+        +chooseMove(state: GameState, player: str, strategy: str) Move
+        +availableStrategies() tuple[str]
+    }
+
+    ModeConfig "1" --> "*" GameState : configures
+    GameState "1" *-- "*" Move : history
+    GameState "1" --> "1" OrderStatus : lifecycle
+    PieceDefinition "1" *-- "1..8" Transform : transforms
+
+    GameEngine ..> ModeConfig : reads
+    GameEngine ..> GameState : creates/mutates
+    GameEngine ..> Move : validates/applies
+    GameEngine ..> ValidationResult : returns
+    GameEngine ..> PieceDefinition : uses catalog
+
+    MoveSelector ..> GameEngine : queries legal moves
+    MoveSelector ..> GameState : evaluates
+    MoveSelector ..> Move : returns
